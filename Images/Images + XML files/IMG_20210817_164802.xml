@@ -1,0 +1,86 @@
+<annotation verified="yes">
+	<folder>Images</folder>
+	<filename>IMG_20210817_164802.jpg</filename>
+	<path>C:\Users\victo.SURFACEPRO-VICT\Downloads\Images\IMG_20210817_164802.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>4608</width>
+		<height>2592</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Stop Sign</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>372</xmin>
+			<ymin>810</ymin>
+			<xmax>712</xmax>
+			<ymax>1157</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Prohibition Sign</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1102</xmin>
+			<ymin>657</ymin>
+			<xmax>1355</xmax>
+			<ymax>906</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Traffic Light</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1459</xmin>
+			<ymin>485</ymin>
+			<xmax>1636</xmax>
+			<ymax>874</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Speed Limit 30</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>1</difficult>
+		<bndbox>
+			<xmin>1674</xmin>
+			<ymin>570</ymin>
+			<xmax>1827</xmax>
+			<ymax>742</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Speed Limit 50</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>1</difficult>
+		<bndbox>
+			<xmin>1829</xmin>
+			<ymin>581</ymin>
+			<xmax>1963</xmax>
+			<ymax>736</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Traffic Light</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>2793</xmin>
+			<ymin>557</ymin>
+			<xmax>3219</xmax>
+			<ymax>1440</ymax>
+		</bndbox>
+	</object>
+</annotation>
