@@ -4,22 +4,22 @@ import logging
 import math
 
 def show_image(name, image):
-    #cv2.imshow(name,image)
-    #cv2.waitKey(0)
+    cv2.imshow(name,image)
+    cv2.waitKey(0)
 
-frame = cv2.imread('/home/pi/PyLot/frame.jpg')
-#show_image("Initial Frame", frame)
+frame = cv2.imread('2021-08-19-123009.jpg')
+show_image("Initial Frame", frame)
 
 
 def detect_edges(frame):
     
     # Isolates blue colors
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    #show_image("HSV Frame", hsv)
+    show_image("HSV Frame", hsv)
     lower_blue = np.array([100, 100, 40]) #Lower spectrum bound, Saturation, Value
     upper_blue = np.array([140, 255, 255]) #Upper spectrum bound, Saturation, Value
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
-    #show_image("Blue Mask", mask)
+    show_image("Blue Mask", mask)
 
     # Extracts edges of all the blue areas (Canny Edge Detection Algorithm)
     edges = cv2.Canny(mask, 200, 400)
@@ -27,7 +27,7 @@ def detect_edges(frame):
     return edges
 
 edges = detect_edges(frame)
-#show_image("Extracted Edges", edges)
+show_image("Extracted Edges", edges)
 
 
 def cut_top_half(edges):
@@ -45,6 +45,7 @@ def cut_top_half(edges):
     cv2.fillPoly(mask, polygon, 255)
     cropped_edges = cv2.bitwise_and(edges, mask)
     return cropped_edges
+
 cropped_edges = cut_top_half(edges)
 show_image("Top Half Deleted", cropped_edges)
 
@@ -155,7 +156,7 @@ def display_lines(frame, lines, line_color=(0, 255, 0), line_width=2):
         for line in lines:
             for x1, y1, x2, y2 in line:
                 cv2.line(line_image, (x1, y1), (x2, y2), line_color, line_width)
-    line_image = cv2.addWeighted(frame, 0.8, line_image, 1, 1)
+    line_image = cv2.addWeighted(frame, 0.8, line_image, 1, 5)
     return line_image
 
 lane_lines = detect_lane(frame)
@@ -216,7 +217,7 @@ def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_wid
     y2 = int(height / 2)
 
     cv2.line(heading_image, (x1, y1), (x2, y2), line_color, line_width)
-    heading_image = cv2.addWeighted(frame, 0.8, heading_image, 1, 1)
+    heading_image = cv2.addWeighted(frame, 0.8, heading_image, 1, 5)
 
     return heading_image
 
