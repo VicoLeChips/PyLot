@@ -203,9 +203,9 @@ show_image("Lane Lines", lane_lines_image)
 
 #Compute steering angle
 def compute_steering_angle(frame, lane_lines):
-""" Find the steering angle based on lane line coordinate
-    We assume that camera is calibrated to point to dead center
-"""
+    """ Find the steering angle based on lane line coordinate
+        We assume that camera is calibrated to point to dead center
+    """
     #If no lane lines detected
     if len(lane_lines) == 0:
         logging.info('No lane lines detected, do nothing')
