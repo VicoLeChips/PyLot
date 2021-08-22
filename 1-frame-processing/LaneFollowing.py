@@ -3,17 +3,28 @@ import numpy as np
 import logging
 import math
 
+############################
+# Utility Functions
+############################
+
+#Show image (window creation)
 def show_image(name, image):
     cv2.imshow(name,image)
     cv2.waitKey(0)
 
+############################
+# Start
+############################
 frame = cv2.imread('2021-08-19-123009.jpg')
 show_image("Initial Frame", frame)
 
+############################
+# Frame processing steps
+############################
 
+#Edge detection
 def detect_edges(frame):
-    
-    # Isolates blue colors
+    #Isolates blue colors
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     show_image("HSV Frame", hsv)
     lower_blue = np.array([100, 100, 40]) #Lower spectrum bound, Saturation, Value
@@ -21,15 +32,20 @@ def detect_edges(frame):
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
     show_image("Blue Mask", mask)
 
-    # Extracts edges of all the blue areas (Canny Edge Detection Algorithm)
+    #Extracts edges of all the blue areas (Canny Edge Detection Algorithm)
     edges = cv2.Canny(mask, 200, 400)
 
     return edges
 
+
+
+#Computation + display
 edges = detect_edges(frame)
 show_image("Extracted Edges", edges)
 
 
+
+#Cut top half of the frame
 def cut_top_half(edges):
     height, width = edges.shape
     mask = np.zeros_like(edges)
@@ -46,21 +62,31 @@ def cut_top_half(edges):
     cropped_edges = cv2.bitwise_and(edges, mask)
     return cropped_edges
 
+
+
+#Computation + display
 cropped_edges = cut_top_half(edges)
 show_image("Top Half Deleted", cropped_edges)
 
+
+
+#Line segment detection
 def detect_line_segments(cropped_edges):
-    # tuning min_threshold, minLineLength, maxLineGap is a trial and error process by hand
-    rho = 1  # distance precision in pixel, i.e. 1 pixel
-    angle = np.pi / 180  # angular precision in radian, i.e. 1 degree
-    min_threshold = 10  # minimal of votes
-    line_segments = cv2.HoughLinesP(cropped_edges, rho, angle, min_threshold, 
-                                    np.array([]), minLineLength=8, maxLineGap=4)
+    rho = 1  #Precision in pixel, i.e. 1 pixel
+    angle = np.pi / 180  #Degree in radian, i.e. 1 degree
+    min_threshold = 10  #Minimal of votes
+    line_segments = cv2.HoughLinesP(cropped_edges, rho, angle, min_threshold, np.array([]), minLineLength=8,
+                                    maxLineGap=4)
 
     return line_segments
 
+
+
+#Computation + display
 line_segments = detect_line_segments(cropped_edges)
 print(line_segments)
+
+
 
 """
 for line in line_segments:
@@ -70,20 +96,21 @@ for line in line_segments:
 show_image("Hough Lines Highlighted", frame)
 """
 
+
 # Takes a line’s slope and intercept, and returns the endpoints of the line segment
 def make_points(frame, line):
     height, width, _ = frame.shape
     slope, intercept = line
-    y1 = height  # bottom of the frame
-    y2 = int(y1 * 1 / 2)  # make points from middle of the frame down
+    y1 = height  #Bottom of the frame
+    y2 = int(y1 * 1 / 2)  #Make points from middle of the frame down
 
-    # bound the coordinates within the frame
+    #Bound the coordinates within the frame
     x1 = max(-width, min(2 * width, int((y1 - intercept) / slope)))
     x2 = max(-width, min(2 * width, int((y2 - intercept) / slope)))
     return [[x1, y1, x2, y2]]
 
 
-# Combine lanes lines
+#Combine lanes lines with slope
 def average_slope_intercept(frame, line_segments):
     """
     This function combines line segments into one or two lane lines
@@ -92,7 +119,7 @@ def average_slope_intercept(frame, line_segments):
     """
     lane_lines = []
     if line_segments is None:
-        logging.info('No line_segment segments detected')
+        logging.info('No line segments detected')
         return lane_lines
 
     height, width, _ = frame.shape
@@ -101,10 +128,12 @@ def average_slope_intercept(frame, line_segments):
     left_fit = []
     right_fit = []
 
+    #Quick filtering line on screen position
     boundary = 1/3  # boundary constant to quick filter lines
     left_region_boundary = width * (1 - boundary)  # left lane line segment should be on left 2/3 of the screen
     right_region_boundary = width * boundary  # right lane line segment should be on right 2/3 of the screen
 
+    #Line segment combination
     for line_segment in line_segments:
         for x1, y1, x2, y2 in line_segment:
             """ 
@@ -112,9 +141,9 @@ def average_slope_intercept(frame, line_segments):
             line segments in polar coordinates and then averaging angles and distance to the origin)) 
             """ 
             if x1 == x2: 
-                logging.info('skipping vertical line segment (slope=inf): %s' % line_segment)
+                logging.info('Vertical line segment detected: %s' % line_segment)
                 continue
-            fit = np.polyfit((x1, x2), (y1, y2), 1) # least squares polynomial fit
+            fit = np.polyfit((x1, x2), (y1, y2), 1) #Least squares polynomial fit
             slope = fit[0]
             intercept = fit[1]
             if slope < 0:
@@ -128,17 +157,20 @@ def average_slope_intercept(frame, line_segments):
     """take the average of the slopes and intercepts of the line segments to get the slopes 
        and intercepts of left and right lane lines
     """
+    #Left lane slope average
     left_fit_average = np.average(left_fit, axis=0)
     if len(left_fit) > 0:
         lane_lines.append(make_points(frame, left_fit_average))
 
+    #Right lane slope average
     right_fit_average = np.average(right_fit, axis=0)
     if len(right_fit) > 0:
         lane_lines.append(make_points(frame, right_fit_average))
 
-    logging.debug('lane lines: %s' % lane_lines)
+    logging.debug('Lane lines: %s' % lane_lines)
 
     return lane_lines
+
 
 # Given a video frame as input, returns the coordinates of (up to) two lane lines
 def detect_lane(frame):
@@ -148,6 +180,7 @@ def detect_lane(frame):
     lane_lines = average_slope_intercept(frame, line_segments)
     
     return lane_lines
+
 
 # Plot the lane lines on top of the original video frame
 def display_lines(frame, lines, line_color=(0, 255, 0), line_width=2):
@@ -159,26 +192,33 @@ def display_lines(frame, lines, line_color=(0, 255, 0), line_width=2):
     line_image = cv2.addWeighted(frame, 0.8, line_image, 1, 5)
     return line_image
 
+
+
+#Computation + display
 lane_lines = detect_lane(frame)
 lane_lines_image = display_lines(frame, lane_lines)
 show_image("Lane Lines", lane_lines_image)
 
 
 
+#Compute steering angle
+def compute_steering_angle(frame, lane_lines):
 """ Find the steering angle based on lane line coordinate
     We assume that camera is calibrated to point to dead center
 """
-def compute_steering_angle(frame, lane_lines):
-
+    #If no lane lines detected
     if len(lane_lines) == 0:
         logging.info('No lane lines detected, do nothing')
         return -90
 
+    #If lane lines detected
     height, width, _ = frame.shape
+    #If one signel line detected
     if len(lane_lines) == 1:
         logging.debug('Only detected one lane line, just follow it. %s' % lane_lines[0])
         x1, _, x2, _ = lane_lines[0][0]
         x_offset = x2 - x1
+    #If both lines are detected
     else:
         _, _, left_x2, _ = lane_lines[0][0]
         _, _, right_x2, _ = lane_lines[1][0]
@@ -186,14 +226,14 @@ def compute_steering_angle(frame, lane_lines):
         mid = int(width / 2 * (1 + camera_mid_offset_percent))
         x_offset = (left_x2 + right_x2) / 2 - mid
 
-    # find the steering angle, which is angle between navigation direction to end of center line
+    #Find the steering angle, which is angle between navigation direction to end of center line (red heading line)
     y_offset = int(height / 2)
 
-    angle_to_mid_radian = math.atan(x_offset / y_offset)  # angle (in radian) to center vertical line
-    angle_to_mid_deg = int(angle_to_mid_radian * 180.0 / math.pi)  # angle (in degrees) to center vertical line
-    steering_angle = angle_to_mid_deg + 90  # this is the steering angle needed by picar front wheel
+    angle_to_mid_radian = math.atan(x_offset / y_offset)  #Angle (in radian) to center vertical line
+    angle_to_mid_deg = int(angle_to_mid_radian * 180.0 / math.pi)  #Angle (in degrees) to center vertical line
+    steering_angle = angle_to_mid_deg + 90  #Steering angle needed by picar front wheel
 
-    logging.debug('new steering angle: %s' % steering_angle)
+    logging.debug('New steering angle: %s' % steering_angle)
     return steering_angle
 
 
@@ -202,7 +242,6 @@ def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_wid
     heading_image = np.zeros_like(frame)
     height, width, _ = frame.shape
 
-    # figure out the heading line from steering angle
     # heading line (x1,y1) is always center bottom of the screen
     # (x2, y2) requires a bit of trigonometry
 
@@ -216,11 +255,17 @@ def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_wid
     x2 = int(x1 - height / 2 / math.tan(steering_angle_radian))
     y2 = int(height / 2)
 
+    #Display line with line_color = red
     cv2.line(heading_image, (x1, y1), (x2, y2), line_color, line_width)
+    
+    #Adding weight to heading line
     heading_image = cv2.addWeighted(frame, 0.8, heading_image, 1, 5)
 
     return heading_image
 
+
+
+#Computation + display
 steering_angle = compute_steering_angle(lane_lines_image, lane_lines)
 lane_lines_image = display_heading_line(lane_lines_image, steering_angle)
 show_image("Red Heading Line", lane_lines_image)

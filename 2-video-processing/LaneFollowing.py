@@ -82,15 +82,15 @@ def detect_lane(frame):
 
 #Edge detection
 def detect_edges(frame):
-    #Filter for blue lane lines
+    #Isolates blue colors
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     show_image("HSV Frame", hsv)
-    lower_blue = np.array([90, 100, 40])
-    upper_blue = np.array([150, 255, 255])
+    lower_blue = np.array([90, 100, 40]) #Lower spectrum bound, Saturation, Value
+    upper_blue = np.array([150, 255, 255]) #Upper spectrum bound, Saturation, Value
     mask = cv2.inRange(hsv, lower_blue, upper_blue)
     show_image("Blue Mask", mask)
 
-    #Detect edges
+    #Extracts edges of all the blue areas (Canny Edge Detection Algorithm)
     edges = cv2.Canny(mask, 200, 400)
 
     return edges
@@ -133,7 +133,7 @@ def detect_line_segments(cropped_edges):
     return line_segments
 
 
-#Average slope of line
+#Combine lanes lines with slope
 def average_slope_intercept(frame, line_segments):
     """
     This function combines line segments into one or two lane lines
@@ -182,7 +182,7 @@ def average_slope_intercept(frame, line_segments):
     if len(right_fit) > 0:
         lane_lines.append(make_points(frame, right_fit_average))
 
-    logging.debug('Lane lines: %s' % lane_lines)  #[[[316, 720, 484, 432]], [[1009, 720, 718, 432]]]
+    logging.debug('Lane lines: %s' % lane_lines)
 
     return lane_lines
 
@@ -281,6 +281,7 @@ def display_heading_line(frame, steering_angle, line_color=(0, 0, 255), line_wid
     x2 = int(x1 - height / 2 / math.tan(steering_angle_radian))
     y2 = int(height / 2)
 
+    #Display line with line_color = red
     cv2.line(heading_image, (x1, y1), (x2, y2), line_color, line_width)
 
     #Adding weight to heading line
@@ -301,7 +302,7 @@ def show_image(title, frame, show=_SHOW_IMAGE):
         cv2.imshow(title, frame)
 
 
-#Make point function
+# Takes a line’s slope and intercept, and returns the endpoints of the line segment
 def make_points(frame, line):
     height, width, _ = frame.shape
     slope, intercept = line
