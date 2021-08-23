@@ -1,3 +1,29 @@
+"""
+This python file contains all useful functions to process one frame
+Class :
+    - FA : Class that allows to create a finite automaton object and to use 
+        its different methods (see docstring FA)
+        
+Functions :
+    - read_automation_from_file : Function that creates and returns a finite automaton 
+        by reading a given text file
+    - read_word : storing in memory a string of characters typed by the user on the keyboard.
+    - create_transition_liste : Function that makes a transition list from the list given 
+        in the .TXT file
+    - merge_list : Simple function to group two lists
+    - merge_list_into_strings : Simple function to group two lists into string
+    - get_transition_list : Fonction to get all the transitions from a table
+    - get_nb_states : Fonction that return the number of keys from a dictionary
+"""
+
+__authors__ = ("BABIN Victor",
+               "DEWATRE Pierre",
+               "DHEILLY Robin", 
+               "GREGOIRE Aurélien"
+               "LEFÈVRE Valentin")
+__date__ = "02/04/2021"
+
+
 import cv2
 import numpy as np
 import logging
