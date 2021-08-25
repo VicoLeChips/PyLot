@@ -55,6 +55,7 @@ class LaneFollower(object):
 ############################
 # Frame processing steps
 ############################
+
 #Lane detection
 def detect_lane(frame):
     logging.debug('detecting lane lines...')
@@ -251,6 +252,7 @@ def stabilize_steering_angle(curr_steering_angle, new_steering_angle, num_of_lan
 ############################
 # Utility Functions
 ############################
+
 #Display line 
 def display_lines(frame, lines, line_color=(0, 255, 0), line_width=10):
     line_image = np.zeros_like(frame)
