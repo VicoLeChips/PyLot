@@ -23,14 +23,12 @@ _SHOW_IMAGE = False
 class DeepLearningLaneFollower(object):
 
     #Constructor 
-    def __init__(self,
-                 car=None,
-                 model_path='/home/pi/Desktop/PyLot_COPY/4-deep-learning/lane_navigation_final.h5'):
+    def __init__(self, car=None, model_path='/home/pi/Desktop/PyLot_COPY/4-deep-learning/lane_navigation_final.h5'):
         logging.info('Creating a DeepLearningLaneFollower...')
-
         self.car = car
         self.curr_steering_angle = 90
         self.model = load_model(model_path, compile = False)  ## force keras 
+
 
     # Main entry point of the lane follower
     def follow_lane(self, frame):
@@ -38,12 +36,14 @@ class DeepLearningLaneFollower(object):
 
         self.curr_steering_angle = self.compute_steering_angle(frame)
         logging.debug("Current steering angle = %d" % self.curr_steering_angle)
-
+        print("IN FOLLOW LANE")
         if self.car is not None:
+            print(self.curr_steering_angle + "IN IF SECTION")
             self.car.front_wheels.turn(self.curr_steering_angle)
         final_frame = display_heading_line(frame, self.curr_steering_angle)
 
         return final_frame
+
 
     #Steering method
     def compute_steering_angle(self, frame):
@@ -54,7 +54,7 @@ class DeepLearningLaneFollower(object):
         preprocessed = img_preprocess(frame)
         X = np.asarray([preprocessed])
         steering_angle = self.model.predict(X)[0]
-    
+        
         """
         preprocessed = img_preprocess(frame)
         X = np.asarray([preprocessed])
