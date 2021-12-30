@@ -23,7 +23,7 @@ from object_detection.utils import dataset_util
 from collections import namedtuple, OrderedDict
 tf.compat.v1.disable_v2_behavior()
 
-flags = tf.app.flags.FLAGS
+flags = tf.app.flags.flags
 flags.DEFINE_string("csv_input", "", "Path to the CSV input")
 flags.DEFINE_string("output_path", "", "Path to output TFRecord")
 flags.DEFINE_string(
@@ -36,7 +36,7 @@ flags.DEFINE_string(
 # flags.DEFINE_string('label1', '', 'Name of class[1] label')
 # and so on.
 flags.DEFINE_string("img_path", "", "Path to images")
-FLAGS = flags.FLAGS
+FLAGS = tf.app.flags.FLAGS
 
 
 def split(df, group):
