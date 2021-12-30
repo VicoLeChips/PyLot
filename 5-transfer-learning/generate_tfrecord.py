@@ -15,6 +15,8 @@ import io
 import pandas as pd
 import tensorflow as tf
 import sys
+from absl import app
+
 
 sys.path.append("../../models/research")
 
@@ -129,4 +131,4 @@ def main(_):
 
 
 if __name__ == "__main__":
-    tf.app.run()
+    app.run()
