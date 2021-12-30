@@ -13,7 +13,7 @@ from __future__ import absolute_import
 import os
 import io
 import pandas as pd
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import sys
 
 sys.path.append("../../models/research")
@@ -21,8 +21,9 @@ sys.path.append("../../models/research")
 from PIL import Image
 from object_detection.utils import dataset_util
 from collections import namedtuple, OrderedDict
+tf.compat.v1.disable_v2_behavior()
 
-flags = tf.app.flags
+flags = tf.app.flags.FLAGS
 flags.DEFINE_string("csv_input", "", "Path to the CSV input")
 flags.DEFINE_string("output_path", "", "Path to output TFRecord")
 flags.DEFINE_string(
